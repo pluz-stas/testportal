@@ -54,4 +54,12 @@ urlpatterns = [
              template_name='auth/password-reset/password_reset_complete.html'
          ),
          name='password_reset_complete'),
+    path('oauth/', include('social_django.urls', namespace='social')),  # <-- here
+
 ]
+
+from django.conf import settings
+from django.conf.urls.static import static
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
