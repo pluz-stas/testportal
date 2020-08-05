@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from django.views.generic import TemplateView
 
 from users.views import HomeView, SignUpView
@@ -15,14 +15,14 @@ urlpatterns = [
     ),
          name='login'
          ),
-
+    path('users/', include("users.urls")),
     path('logout/', auth_views.LogoutView.as_view(
         next_page='home'
     ),
          name='logout'
          ),
     path(
-        'change-password',
+        'change-password/',
         auth_views.PasswordChangeView.as_view(
             template_name='auth/change-password.html',
             success_url='/'
