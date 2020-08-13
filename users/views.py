@@ -21,7 +21,7 @@ class SignUpView(CreateView):
 
 
 class UserView(LoginRequiredMixin, TemplateView):
-    template_name = 'user/profile.html'
+    template_name = 'user/user-detail.html'
 
 
 class UserUpdateView(LoginRequiredMixin, TemplateView):

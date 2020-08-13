@@ -16,6 +16,7 @@ urlpatterns = [
          name='login'
          ),
     path('users/', include("users.urls")),
+    path('tests/', include("tests.urls")),
     path('logout/', auth_views.LogoutView.as_view(
         next_page='home'
     ),
