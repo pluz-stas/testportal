@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth import get_user_model
 from django.forms import TextInput
 
-from tests.models import Test
+from tests.models import Test, TestCase
 
 
 class TestForm(forms.ModelForm):
@@ -14,14 +14,15 @@ class TestForm(forms.ModelForm):
         ]
 
 
-class TestCase(forms.ModelForm):
+class TestCaseForm(forms.ModelForm):
 
     class Meta:
-        model = Test
-        fields = "__all__"
+        model = TestCase
+        fields = ["content",]
 
 
-class Answer(forms.ModelForm):
+
+class AnswerForm(forms.ModelForm):
 
     class Meta:
         model = Test

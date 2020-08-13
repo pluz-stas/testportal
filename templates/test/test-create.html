@@ -19,12 +19,12 @@
               <div class="col-lg-6">
                 <div class="p-5">
                   <div class="text-center">
-                    <h1 class="h4 text-gray-900 mb-4">Update Your Profile!</h1>
+                    <h1 class="h4 text-gray-900 mb-4">Create test</h1>
                   </div>
                   <form method="POST" enctype="multipart/form-data">
                     {% csrf_token %}
                     {{test_form | crispy}}
-                    <button type="submit" class="btn btn-success btn-block">Update</button>
+                    <button type="submit" class="btn btn-success btn-block">Create</button>
                   </form>
                   <hr>
                   <div class="text-center">

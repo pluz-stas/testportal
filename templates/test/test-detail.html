@@ -9,13 +9,10 @@
 
         <!-- Page Heading -->
         <div class="d-sm-flex align-items-center justify-content-between mb-4 mt-4">
-        <h1 class="h3 mb-0 text-gray-800">{{test.title}}</h1>
-        <p class="mb-0 text-gray-800">{{test.description}}</p>
+            <h1 class="h3 mb-0 text-gray-800">{{ test.title }}</h1>
+            <p class="mb-0 text-gray-800">{{ test.description }}</p>
         </div>
-
-
-                <a href="{% url 'user-update' %}" class="btn btn-sm btn-primary shadow-sm">Update Profile</a>
-
+        <a href="{% url 'test-update' test.id %}" class="btn btn-sm btn-primary shadow-sm">Update Profile</a>
     </div>
     <!-- /.container-fluid -->
 {% endblock content %}
