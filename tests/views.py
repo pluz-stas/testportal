@@ -23,6 +23,8 @@ class TestCaseCreateView(LoginRequiredMixin, TemplateView):
             if test_id:
                 instance.test = Test.objects.get(id=test_id)
             instance.save()
+            return HttpResponseRedirect(reverse_lazy('test-update', args=[str(test_id),]))
+
             # messages.error(request, 'Your profile is updated successfully!')
 
         context = self.get_context_data(test_case_form=test_case_form, )
@@ -31,6 +33,7 @@ class TestCaseCreateView(LoginRequiredMixin, TemplateView):
 
     def get(self, request, *args, **kwargs):
         return self.post(request)
+
 
 class TestListView(LoginRequiredMixin, FilterView):
     model = Test
@@ -57,6 +60,7 @@ class TestUpdateView(LoginRequiredMixin, TemplateView):
 
     def post(self, request, test_id=None):
         test = Test.objects.get(id=test_id)
+        test_case_list = TestCase.objects.filter(test=test)
         test_form = TestForm(request.POST or None)
 
         if test_form.is_valid():
@@ -64,12 +68,14 @@ class TestUpdateView(LoginRequiredMixin, TemplateView):
             # messages.error(request, 'Your profile is updated successfully!')
             return HttpResponseRedirect(reverse_lazy('user-details'))
 
-        context = self.get_context_data(test_form=test_form, test=test)
+        context = self.get_context_data(test_form=test_form, test=test, test_case_list=test_case_list)
 
         return self.render_to_response(context)
 
     def get(self, request, *args, **kwargs):
+
         return self.post(request, *args, **kwargs)
+
 
 class TestCreateView(LoginRequiredMixin, TemplateView):
     test_form = TestForm
