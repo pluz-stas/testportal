@@ -13,13 +13,14 @@ class Test(models.Model):
 class TestCase(models.Model):
     test = models.ForeignKey(Test, on_delete=models.CASCADE, null=True, blank=True)
     content = models.CharField(max_length=255, null=True)
+    score = models.DecimalField(max_digits=2, decimal_places=1, null=True)
 
 
 class Answer(models.Model):
     users_answers = models.ManyToManyField(User, related_name="users_answers")
     test_case = models.ForeignKey(TestCase, on_delete=models.CASCADE)
     content = models.CharField(max_length=255, null=True, blank=True)
-
+    is_correct = models.BooleanField(default=False)
 
 class Comment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
