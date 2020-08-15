@@ -19,7 +19,7 @@ class TestCase(models.Model):
 class Answer(models.Model):
     users_answers = models.ManyToManyField(User, related_name="users_answers")
     test_case = models.ForeignKey(TestCase, on_delete=models.CASCADE)
-    content = models.CharField(max_length=255, null=True, blank=True)
+    content = models.CharField(max_length=255, null=True)
     is_correct = models.BooleanField(default=False)
 
 class Comment(models.Model):

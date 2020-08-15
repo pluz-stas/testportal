@@ -3,12 +3,39 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse_lazy
-from django.views.generic import TemplateView, DetailView, ListView, CreateView, UpdateView
+from django.views.generic import TemplateView, DetailView, ListView, CreateView, UpdateView, DeleteView
 from django_filters.views import FilterView
 
 from tests.filters import TestFilter
-from tests.forms import TestForm, TestCaseForm
-from tests.models import Test, TestCase
+from tests.forms import TestForm, TestCaseForm, AnswerForm
+from tests.models import Test, TestCase, Answer
+
+
+class AnswerDeleteView(LoginRequiredMixin, DeleteView):
+    model = Answer
+    success_url = reverse_lazy("test-list")
+
+
+class AnswerCreateView(LoginRequiredMixin, TemplateView):
+    template_name = 'test/answer-create.html'
+    answer_form = AnswerForm
+
+    def post(self, request, test_id=None, test_case_id=None):
+        answer_form = AnswerForm(request.POST)
+
+        if answer_form.is_valid():
+            instance = answer_form.save(commit=False)
+            if test_case_id:
+                instance.test_case = TestCase.objects.get(id=test_case_id)
+            instance.save()
+            return HttpResponseRedirect(reverse_lazy('test-update', args=[str(test_id),]))
+
+        context = self.get_context_data(answer_form=answer_form, )
+
+        return self.render_to_response(context)
+
+    def get(self, request, *args, **kwargs):
+        return self.post(request)
 
 
 class TestCaseCreateView(LoginRequiredMixin, TemplateView):
@@ -60,15 +87,13 @@ class TestUpdateView(LoginRequiredMixin, TemplateView):
 
     def post(self, request, test_id=None):
         test = Test.objects.get(id=test_id)
-        test_case_list = TestCase.objects.filter(test=test)
         test_form = TestForm(request.POST or None)
 
         if test_form.is_valid():
             test_form.save()
             # messages.error(request, 'Your profile is updated successfully!')
             return HttpResponseRedirect(reverse_lazy('user-details'))
-
-        context = self.get_context_data(test_form=test_form, test=test, test_case_list=test_case_list)
+        context = self.get_context_data(test_form=test_form, test=test)
 
         return self.render_to_response(context)
 

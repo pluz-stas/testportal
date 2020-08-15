@@ -8,11 +8,20 @@
     <div class="container-fluid">
 
         <!-- Page Heading -->
-        <div class="d-sm-flex align-items-center justify-content-between mb-4 mt-4">
+        <div class=" align-items-center justify-content-between mb-4 mt-4">
             <h1 class="h3 mb-0 text-gray-800">{{ test.title }}</h1>
             <p class="mb-0 text-gray-800">{{ test.description }}</p>
         </div>
-        <a href="{% url 'test-update' test.id %}" class="btn btn-sm btn-primary shadow-sm">Update Profile</a>
+        <div class="row">
+            <div class="col-lg-1">
+                <a href="{% url 'test-update' test.id %}" class="btn btn-sm btn-primary shadow-sm">Update
+                    test</a>
+            </div>
+            <div class="col-lg-1">
+                <a href="{% url 'test-update' test.id %}" class="btn btn-sm btn-primary shadow-sm">Start
+                    test</a>
+            </div>
+        </div>
     </div>
     <!-- /.container-fluid -->
 {% endblock content %}
