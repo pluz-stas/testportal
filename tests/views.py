@@ -11,6 +11,9 @@ from tests.forms import TestForm, TestCaseForm, AnswerForm
 from tests.models import Test, TestCase, Answer
 
 
+# class TestCompleteView(LoginRequiredMixin, TemplateView):
+
+
 class AnswerDeleteView(LoginRequiredMixin, DeleteView):
     model = Answer
     success_url = reverse_lazy("test-list")
@@ -51,8 +54,6 @@ class TestCaseCreateView(LoginRequiredMixin, TemplateView):
                 instance.test = Test.objects.get(id=test_id)
             instance.save()
             return HttpResponseRedirect(reverse_lazy('test-update', args=[str(test_id),]))
-
-            # messages.error(request, 'Your profile is updated successfully!')
 
         context = self.get_context_data(test_case_form=test_case_form, )
 

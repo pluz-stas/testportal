@@ -31,4 +31,5 @@ class UserForm(forms.ModelForm):
             'first_name',
             'last_name',
             'bio',
+            'birth_date',
         ]

@@ -20,7 +20,7 @@ class SignUpView(CreateView):
     template_name = 'auth/register.html'
 
 
-class UserView(LoginRequiredMixin, TemplateView):
+class UserDetailView(LoginRequiredMixin, TemplateView):
     template_name = 'user/user-detail.html'
 
 
@@ -33,7 +33,7 @@ class UserUpdateView(LoginRequiredMixin, TemplateView):
         post_data = request.POST or None
         file_data = request.FILES or None
 
-        user_form = UserForm(post_data, instance=request.user)
+        user_form = UserForm(post_data, file_data, instance=request.user)
 
         if user_form.is_valid():
             user_form.save()

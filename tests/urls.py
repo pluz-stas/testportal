@@ -7,7 +7,7 @@ from tests.models import Test
 from tests.views import (
     TestCreateView, TestDetailView, TestListView, TestUpdateView, TestCaseCreateView, AnswerCreateView, AnswerDeleteView
 )
-from users.views import UserUpdateView, UserView
+from users.views import UserUpdateView, UserDetailView
 
 urlpatterns = [
     path('create/', TestCreateView.as_view(), name='test-create'),

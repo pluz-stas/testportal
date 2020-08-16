@@ -9,7 +9,8 @@ class User(AbstractUser):
 
     email = models.EmailField(unique=True)
     bio = models.TextField(max_length=500, blank=True)
-    image = models.ImageField(default='default-avatar.img', upload_to='users/img', null=True, blank=True)
+    image = models.ImageField(default='default-avatar.jpg', upload_to='users/img', null=True, blank=True)
+    birth_date = models.DateField(null=True, blank=True)
 
     EMAIL_FIELD = 'email'
     USERNAME_FIELD = 'email'
