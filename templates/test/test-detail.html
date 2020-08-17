@@ -43,7 +43,7 @@
             {% endfor %}
             <form method="post" action="{% url 'comment-create' test_id=test.id %}">
                 {% csrf_token %}
-                {{ comment_form|crispy }}
+                {{ comment_form | crispy }}
                 <button type="submit" class="btn btn-sm btn-primary shadow-sm">Submit</button>
             </form>
         </div>

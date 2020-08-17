@@ -7,3 +7,6 @@ admin.site.register(UserTests)
 admin.site.register(Answer)
 admin.site.register(Comment)
 admin.site.register(TestCase)
+
+
+

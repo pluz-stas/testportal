@@ -124,9 +124,12 @@ class TestListView(LoginRequiredMixin, FilterView):
     def get_queryset(self):
         queryset = super(TestListView, self).get_queryset()
         owned = self.request.GET.get('owned', None)
+        completed = self.request.GET.get('completed', None)
         user = self.request.user or None
         if owned and user:
             queryset = queryset.filter(owner=user)
+        if completed:
+            queryset = queryset.filter(completed_by=self.request.user)
         return queryset
 
 
