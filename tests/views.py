@@ -1,5 +1,6 @@
 from bootstrap_modal_forms.generic import BSModalCreateView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import Sum
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse_lazy
@@ -140,8 +141,10 @@ class TestDetailView(LoginRequiredMixin, View):
             test.count = list_of_completes.count()
         if request_user_results:
             test.result = request_user_results.first().score
+        test.score = test.testcase_set.all().aggregate(Sum("score")).get("score__sum", None)
         owner = request.user == test.owner
-        return render(request, template_name="test/test-detail.html", context={"test": test, "owner": owner, "comment_form":comment_form})
+        return render(request, template_name="test/test-detail.html", context={"test": test, "owner": owner, "comment_form": comment_form})
+
 
 class TestUpdateView(LoginRequiredMixin, TemplateView):
     test_form = TestForm
