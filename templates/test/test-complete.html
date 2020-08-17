@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+    <!-- Begin Page Content -->
+    <div class="container-fluid">
+
+        <!-- Page Heading -->
+        <div class="d-sm-flex align-items-center justify-content-between mb-4 mt-4">
+            <h1 class="h3 mb-0 text-gray-800">Title: {{ test.title }}</h1>
+        </div>
+        <p class="mb-0 text-gray-800">Description: {{ test.description }}</p>
+
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="p-5">
+                    <hr>
+                    <form method="POST" action="{% url 'test-complete' test_id=test.id %}">
+                        {% csrf_token %}
+                        {% for test_case in test.testcase_set.all %}
+                            <div class="card p-5">
+                                <div class="row">
+                                    <div class="col-lg-7">
+                                        <p>{{ test_case.content }}</p>
+                                        {% for answer in test_case.answer_set.all %}
+                                            <p>
+                                                <label for="{{ answer.id }}"></label>
+                                                <input id="{{ answer.id }}" type="checkbox" name="answers" value="{{answer.id}}">
+                                                {{ answer.content }}
+                                            </p>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 justify-content-end">
+                                <p class="text-gray-600">Score: {{ test_case.score }}</p>
+                            </div>
+                        {% endfor %}
+                        <button type="submit"></button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

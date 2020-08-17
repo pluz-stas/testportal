@@ -21,6 +21,8 @@ class Answer(models.Model):
     test_case = models.ForeignKey(TestCase, on_delete=models.CASCADE)
     content = models.CharField(max_length=255, null=True)
     is_correct = models.BooleanField(default=False)
+    # score = models.DecimalField(max_digits=2, decimal_places=1, null=True, blank=True)
+
 
 class Comment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

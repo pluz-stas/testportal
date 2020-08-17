@@ -5,7 +5,8 @@ from django_filters.views import FilterView
 
 from tests.models import Test
 from tests.views import (
-    TestCreateView, TestDetailView, TestListView, TestUpdateView, TestCaseCreateView, AnswerCreateView, AnswerDeleteView
+    TestCreateView, TestDetailView, TestListView, TestUpdateView, TestCaseCreateView, AnswerCreateView,
+    AnswerDeleteView, TestCompleteView
 )
 from users.views import UserUpdateView, UserDetailView
 
@@ -20,4 +21,5 @@ urlpatterns = [
     path('update/<int:test_id>/', TestUpdateView.as_view(), name='test-update'),
     path('list/', TestListView.as_view(), name='test-list'),
     path('detail/<int:pk>/', TestDetailView.as_view(), name='test-detail'),
+    path('complete/<int:test_id>/', TestCompleteView.as_view(), name='test-complete'),
 ]

@@ -8,10 +8,45 @@ from django_filters.views import FilterView
 
 from tests.filters import TestFilter
 from tests.forms import TestForm, TestCaseForm, AnswerForm
-from tests.models import Test, TestCase, Answer
+from tests.models import Test, TestCase, Answer, UserTests
 
 
-# class TestCompleteView(LoginRequiredMixin, TemplateView):
+class TestCompleteView(LoginRequiredMixin, TemplateView):
+    template_name = "test/test-complete.html"
+
+    def post(self, request, test_id: int = None):
+        test = Test.objects.get(id=test_id)
+        if request.POST and request.user:
+            for answer in request.POST.getlist("answers"):
+                try:
+                    request.user.users_answers.add(int(answer))
+                except ValueError:
+                    break
+                request.user.save()
+            self.save_result(user=request.user, test=test)
+
+        context = self.get_context_data(test=test)
+        return self.render_to_response(context)
+
+    def save_result(self, user, test):
+        score = 0
+        for test_case in test.testcase_set.all():
+            correct_answers = test_case.answer_set.filter(is_correct=True)
+            user_answers = user.users_answers.filter(test_case=test_case)
+
+            if user_answers.count() > 0:
+                coef = correct_answers.count() / user_answers.count()
+                if coef > 1:
+                    coef = 1
+                score_per_answer = float(test_case.score / correct_answers.count()) * coef
+                if coef > 0.6:
+                    score += user_answers.filter(is_correct=True).count() * score_per_answer
+
+        result = UserTests(user=user, test=test, score=score)
+        result.save()
+
+    def get(self, request, *args, **kwargs):
+        return self.post(request, *args, **kwargs)
 
 
 class AnswerDeleteView(LoginRequiredMixin, DeleteView):
@@ -31,7 +66,7 @@ class AnswerCreateView(LoginRequiredMixin, TemplateView):
             if test_case_id:
                 instance.test_case = TestCase.objects.get(id=test_case_id)
             instance.save()
-            return HttpResponseRedirect(reverse_lazy('test-update', args=[str(test_id),]))
+            return HttpResponseRedirect(reverse_lazy('test-update', args=[str(test_id), ]))
 
         context = self.get_context_data(answer_form=answer_form, )
 
@@ -53,7 +88,7 @@ class TestCaseCreateView(LoginRequiredMixin, TemplateView):
             if test_id:
                 instance.test = Test.objects.get(id=test_id)
             instance.save()
-            return HttpResponseRedirect(reverse_lazy('test-update', args=[str(test_id),]))
+            return HttpResponseRedirect(reverse_lazy('test-update', args=[str(test_id), ]))
 
         context = self.get_context_data(test_case_form=test_case_form, )
 
@@ -89,7 +124,6 @@ class TestUpdateView(LoginRequiredMixin, TemplateView):
     def post(self, request, test_id=None):
         test = Test.objects.get(id=test_id)
         test_form = TestForm(request.POST or None)
-
         if test_form.is_valid():
             test_form.save()
             # messages.error(request, 'Your profile is updated successfully!')
@@ -99,7 +133,6 @@ class TestUpdateView(LoginRequiredMixin, TemplateView):
         return self.render_to_response(context)
 
     def get(self, request, *args, **kwargs):
-
         return self.post(request, *args, **kwargs)
 
 
@@ -108,7 +141,6 @@ class TestCreateView(LoginRequiredMixin, TemplateView):
     template_name = 'test/test-create.html'
 
     def post(self, request):
-
         test_form = TestForm(request.POST)
 
         if test_form.is_valid():
@@ -116,9 +148,9 @@ class TestCreateView(LoginRequiredMixin, TemplateView):
             instance.owner = request.user
             instance.save()
             # messages.error(request, 'Your profile is updated successfully!')
-            return HttpResponseRedirect(reverse_lazy('test-detail', args=[str(instance.id),]))
+            return HttpResponseRedirect(reverse_lazy('test-detail', args=[str(instance.id), ]))
 
-        context = self.get_context_data(test_form=test_form,)
+        context = self.get_context_data(test_form=test_form, )
 
         return self.render_to_response(context)
 
