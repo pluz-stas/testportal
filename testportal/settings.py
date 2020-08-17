@@ -108,6 +108,8 @@ STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
+FIXTURE_DIRS = os.path.join(BASE_DIR, 'fixtures')
+
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 MEDIA_URL = '/media/'
@@ -119,3 +121,5 @@ SOCIAL_AUTH_FACEBOOK_KEY = '297431994873595'
 SOCIAL_AUTH_FACEBOOK_SECRET = '8d7a7efaf4938e21de55176b95115607'
 
 LOGIN_REDIRECT_URL = '/users/details/'
+
+LOGIN_URL = "/"
