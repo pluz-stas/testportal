@@ -9,18 +9,42 @@
 
         <!-- Page Heading -->
         <div class=" align-items-center justify-content-between mb-4 mt-4">
-            <h1 class="h3 mb-0 text-gray-800">{{ test.title }}</h1>
-            <p class="mb-0 text-gray-800">{{ test.description }}</p>
+            <h1 class="h3 mb-0 text-gray-800">Title: {{ test.title }}</h1>
+            <p class="mb-0 text-gray-800">Description: {{ test.description }}</p>
+            {% if test.result %}
+                <p class="mb-0 text-gray-800">You result: {{ test.result }}</p>
+            {% endif %}
+            {% if test.count %}
+                <p class="mb-0 text-gray-800">Count of users: {{ test.count }}</p>
+            {% endif %}
         </div>
+
         <div class="row">
             <div class="col-lg-1">
-                <a href="{% url 'test-update' test.id %}" class="btn btn-sm btn-primary shadow-sm">Update
+                <a href="{% url 'test-update' test.id %}"
+                   class="btn btn-sm btn-primary shadow-sm{% if not owner %} disabled{% endif %}">Update
                     test</a>
             </div>
             <div class="col-lg-1">
-                <a href="{% url 'test-complete' test.id %}" class="btn btn-sm btn-primary shadow-sm">Start
+                <a href="{% url 'test-complete' test.id %}"
+                   class="btn btn-sm btn-primary shadow-sm{% if test.result %} disabled{% endif %}">Start
                     test</a>
             </div>
+        </div>
+        <div class="m-4">
+            <h3>Comments:</h3>
+
+            {% for comment in test.comment_set.all %}
+                <div class="card p-3">
+                    <p class="text-gray-900">{{ comment.user.username }}</p>
+                    {{ comment.content }}
+                </div>
+            {% endfor %}
+            <form method="post" action="{% url 'comment-create' test_id=test.id %}">
+                {% csrf_token %}
+                {{ comment_form|crispy }}
+                <button type="submit" class="btn btn-sm btn-primary shadow-sm">Submit</button>
+            </form>
         </div>
     </div>
     <!-- /.container-fluid -->

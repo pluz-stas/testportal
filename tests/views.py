@@ -3,12 +3,14 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse_lazy
+from django.views import View
 from django.views.generic import TemplateView, DetailView, ListView, CreateView, UpdateView, DeleteView
 from django_filters.views import FilterView
 
 from tests.filters import TestFilter
-from tests.forms import TestForm, TestCaseForm, AnswerForm
-from tests.models import Test, TestCase, Answer, UserTests
+from tests.forms import TestForm, TestCaseForm, AnswerForm, CommentForm
+from tests.models import Test, TestCase, Answer, UserTests, Comment
+from users.models import User
 
 
 class TestCompleteView(LoginRequiredMixin, TemplateView):
@@ -28,7 +30,8 @@ class TestCompleteView(LoginRequiredMixin, TemplateView):
         context = self.get_context_data(test=test)
         return self.render_to_response(context)
 
-    def save_result(self, user, test):
+    @staticmethod
+    def save_result(user: User, test: Test):
         score = 0
         for test_case in test.testcase_set.all():
             correct_answers = test_case.answer_set.filter(is_correct=True)
@@ -98,6 +101,20 @@ class TestCaseCreateView(LoginRequiredMixin, TemplateView):
         return self.post(request)
 
 
+class CommentCreateView(LoginRequiredMixin, View):
+
+    def post(self, request, test_id=None):
+        comment_form = CommentForm(request.POST)
+
+        if comment_form.is_valid():
+            instance = comment_form.save(commit=False)
+            if test_id:
+                instance.test = Test.objects.get(id=test_id)
+                instance.user = request.user
+            instance.save()
+        return HttpResponseRedirect(reverse_lazy('test-detail', args=[str(test_id), ]))
+
+
 class TestListView(LoginRequiredMixin, FilterView):
     model = Test
     filterset_class = TestFilter
@@ -112,10 +129,19 @@ class TestListView(LoginRequiredMixin, FilterView):
         return queryset
 
 
-class TestDetailView(LoginRequiredMixin, DetailView):
-    model = Test
-    template_name = "test/test-detail.html"
+class TestDetailView(LoginRequiredMixin, View):
 
+    def get(self, request, pk, *args, **kwargs):
+        comment_form = CommentForm()
+        test = Test.objects.get(id=pk)
+        request_user_results = UserTests.objects.filter(test__completed_by=request.user)
+        list_of_completes = UserTests.objects.filter(test=test)
+        if list_of_completes:
+            test.count = list_of_completes.count()
+        if request_user_results:
+            test.result = request_user_results.first().score
+        owner = request.user == test.owner
+        return render(request, template_name="test/test-detail.html", context={"test": test, "owner": owner, "comment_form":comment_form})
 
 class TestUpdateView(LoginRequiredMixin, TemplateView):
     test_form = TestForm
@@ -123,14 +149,17 @@ class TestUpdateView(LoginRequiredMixin, TemplateView):
 
     def post(self, request, test_id=None):
         test = Test.objects.get(id=test_id)
-        test_form = TestForm(request.POST or None)
-        if test_form.is_valid():
-            test_form.save()
-            # messages.error(request, 'Your profile is updated successfully!')
-            return HttpResponseRedirect(reverse_lazy('user-details'))
-        context = self.get_context_data(test_form=test_form, test=test)
+        if test.owner == request.user:
+            test_form = TestForm(request.POST or None)
+            if test_form.is_valid():
+                test_form.save()
+                # messages.error(request, 'Your profile is updated successfully!')
+                return HttpResponseRedirect(reverse_lazy('user-details'))
+            context = self.get_context_data(test_form=test_form, test=test)
 
-        return self.render_to_response(context)
+            return self.render_to_response(context)
+        else:
+            raise Exception("Permission denied")
 
     def get(self, request, *args, **kwargs):
         return self.post(request, *args, **kwargs)
