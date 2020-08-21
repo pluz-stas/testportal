@@ -14,6 +14,7 @@ from tests.models import Test, TestCase, Answer, UserTests, Comment
 from users.models import User
 
 
+
 class TestCompleteView(LoginRequiredMixin, TemplateView):
     template_name = "test/test-complete.html"
 
@@ -26,28 +27,32 @@ class TestCompleteView(LoginRequiredMixin, TemplateView):
                 except ValueError:
                     break
                 request.user.save()
-            self.save_result(user=request.user, test=test)
+            score = self.calculate_result(user=request.user, test=test)
+
+            result = UserTests(user=request.user, test=test, score=score)
+            result.save()
+            return HttpResponseRedirect(redirect_to=reverse_lazy("test-detail", args=[str(test_id), ]))
 
         context = self.get_context_data(test=test)
         return self.render_to_response(context)
 
     @staticmethod
-    def save_result(user: User, test: Test):
+    def calculate_result(user: User, test: Test):
         score = 0
         for test_case in test.testcase_set.all():
             correct_answers = test_case.answer_set.filter(is_correct=True)
             user_answers = user.users_answers.filter(test_case=test_case)
 
-            if user_answers.count() > 0:
+            if user_answers and correct_answers:
                 coef = correct_answers.count() / user_answers.count()
                 if coef > 1:
                     coef = 1
                 score_per_answer = float(test_case.score / correct_answers.count()) * coef
                 if coef > 0.6:
                     score += user_answers.filter(is_correct=True).count() * score_per_answer
+        return score
 
-        result = UserTests(user=user, test=test, score=score)
-        result.save()
+
 
     def get(self, request, *args, **kwargs):
         return self.post(request, *args, **kwargs)
@@ -66,9 +71,10 @@ class AnswerCreateView(LoginRequiredMixin, TemplateView):
         answer_form = AnswerForm(request.POST)
 
         if answer_form.is_valid():
+            test_case = TestCase.objects.get(id=test_case_id)
             instance = answer_form.save(commit=False)
             if test_case_id:
-                instance.test_case = TestCase.objects.get(id=test_case_id)
+                instance.test_case = test_case
             instance.save()
             return HttpResponseRedirect(reverse_lazy('test-update', args=[str(test_id), ]))
 
@@ -138,7 +144,7 @@ class TestDetailView(LoginRequiredMixin, View):
     def get(self, request, pk, *args, **kwargs):
         comment_form = CommentForm()
         test = Test.objects.get(id=pk)
-        request_user_results = UserTests.objects.filter(test__completed_by=request.user)
+        request_user_results = UserTests.objects.filter(test=test).filter(test__completed_by=request.user)
         list_of_completes = UserTests.objects.filter(test=test)
         if list_of_completes:
             test.count = list_of_completes.count()
@@ -160,7 +166,7 @@ class TestUpdateView(LoginRequiredMixin, TemplateView):
             if test_form.is_valid():
                 test_form.save()
                 # messages.error(request, 'Your profile is updated successfully!')
-                return HttpResponseRedirect(reverse_lazy('user-details'))
+                return HttpResponseRedirect(reverse_lazy('test-details', args=[str(test.id),]))
             context = self.get_context_data(test_form=test_form, test=test)
 
             return self.render_to_response(context)
