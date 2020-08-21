@@ -14,7 +14,6 @@ from tests.models import Test, TestCase, Answer, UserTests, Comment
 from users.models import User
 
 
-
 class TestCompleteView(LoginRequiredMixin, TemplateView):
     template_name = "test/test-complete.html"
 
@@ -28,7 +27,6 @@ class TestCompleteView(LoginRequiredMixin, TemplateView):
                     break
                 request.user.save()
             score = self.calculate_result(user=request.user, test=test)
-
             result = UserTests(user=request.user, test=test, score=score)
             result.save()
             return HttpResponseRedirect(redirect_to=reverse_lazy("test-detail", args=[str(test_id), ]))
@@ -51,8 +49,6 @@ class TestCompleteView(LoginRequiredMixin, TemplateView):
                 if coef > 0.6:
                     score += user_answers.filter(is_correct=True).count() * score_per_answer
         return score
-
-
 
     def get(self, request, *args, **kwargs):
         return self.post(request, *args, **kwargs)

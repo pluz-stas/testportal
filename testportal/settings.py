@@ -1,4 +1,6 @@
 import os
+from django.contrib.messages import constants as messages
+
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 's3%by7ymq0$#hwjwe=e=2rmui1*sj(7tucycq4v6u4*27hfxt4'
@@ -91,6 +93,13 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+MESSAGE_TAGS = {
+    messages.DEBUG: 'alert-info',
+    messages.INFO: 'alert-info',
+    messages.SUCCESS: 'alert-success',
+    messages.WARNING: 'alert-warning',
+    messages.ERROR: 'alert-danger',
+}
 
 LANGUAGE_CODE = 'en-us'
 
