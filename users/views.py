@@ -10,10 +10,6 @@ from .forms import SignUpForm, UserForm
 from django.urls import reverse_lazy
 
 
-class HomeView(TemplateView):
-    template_name = 'auth/home.html'
-
-
 class SignUpView(CreateView):
     form_class = SignUpForm
     success_url = reverse_lazy('home')

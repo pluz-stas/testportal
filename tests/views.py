@@ -1,7 +1,6 @@
-from bootstrap_modal_forms.generic import BSModalCreateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Sum
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views import View
@@ -167,7 +166,7 @@ class TestUpdateView(LoginRequiredMixin, TemplateView):
 
             return self.render_to_response(context)
         else:
-            raise Exception("Permission denied")
+            return HttpResponse(status=403)
 
     def get(self, request, *args, **kwargs):
         return self.post(request, *args, **kwargs)
@@ -184,7 +183,6 @@ class TestCreateView(LoginRequiredMixin, TemplateView):
             instance = test_form.save(commit=False)
             instance.owner = request.user
             instance.save()
-            # messages.error(request, 'Your profile is updated successfully!')
             return HttpResponseRedirect(reverse_lazy('test-detail', args=[str(instance.id), ]))
 
         context = self.get_context_data(test_form=test_form, )

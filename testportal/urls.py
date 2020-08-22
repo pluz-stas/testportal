@@ -2,15 +2,20 @@ from django.contrib import admin
 from django.urls import path, include
 from django.views.generic import TemplateView
 
-from users.views import HomeView, SignUpView
+from users.views import SignUpView
 
 from django.contrib.auth import views as auth_views
 
 urlpatterns = [
-    path('', HomeView.as_view(), name='home'),
+    path('', auth_views.LoginView.as_view(
+        redirect_authenticated_user=True,
+        template_name='auth/login.html'
+    )
+         ),
     path('admin/', admin.site.urls),
     path('register/', SignUpView.as_view(), name="register"),
     path('login/', auth_views.LoginView.as_view(
+        redirect_authenticated_user=True,
         template_name='auth/login.html'
     ),
          name='login'
@@ -55,7 +60,7 @@ urlpatterns = [
              template_name='auth/password-reset/password_reset_complete.html'
          ),
          name='password_reset_complete'),
-    path('oauth/', include('social_django.urls', namespace='social')),  # <-- here
+    path('oauth/', include('social_django.urls', namespace='social')),
 
 ]
 
