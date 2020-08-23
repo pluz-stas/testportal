@@ -4,12 +4,14 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views import View
-from django.views.generic import TemplateView, DetailView, ListView, CreateView, UpdateView, DeleteView
+from django.views.generic import TemplateView, DeleteView
 from django_filters.views import FilterView
+from django_tables2 import SingleTableView
 
 from tests.filters import TestFilter
 from tests.forms import TestForm, TestCaseForm, AnswerForm, CommentForm
-from tests.models import Test, TestCase, Answer, UserTests, Comment
+from tests.models import Test, TestCase, Answer, UserTests
+from tests.tables import TestTable
 from users.models import User
 
 
@@ -117,9 +119,10 @@ class CommentCreateView(LoginRequiredMixin, View):
         return HttpResponseRedirect(reverse_lazy('test-detail', args=[str(test_id), ]))
 
 
-class TestListView(LoginRequiredMixin, FilterView):
+class TestListView(LoginRequiredMixin, FilterView, SingleTableView):
     model = Test
     filterset_class = TestFilter
+    table_class = TestTable
     template_name = "test/test-list.html"
 
     def get_queryset(self):
@@ -160,7 +163,6 @@ class TestUpdateView(LoginRequiredMixin, TemplateView):
             test_form = TestForm(request.POST or None)
             if test_form.is_valid():
                 test_form.save()
-                # messages.error(request, 'Your profile is updated successfully!')
                 return HttpResponseRedirect(reverse_lazy('test-details', args=[str(test.id),]))
             context = self.get_context_data(test_form=test_form, test=test)
 

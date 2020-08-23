@@ -16,6 +16,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'users',
     'tests',
+    'django_tables2',
     'crispy_forms',
     'social_django',
     'bootstrap_modal_forms',
