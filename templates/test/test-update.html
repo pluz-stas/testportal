@@ -34,10 +34,10 @@
                                         <form method="POST" action="{% url 'answer-delete' pk=answer.id %}">
                                             <p>
                                                 {% if answer.is_correct %}
-                                                <input type="radio" disabled checked>
-                                            {% else %}
-                                                <input type="radio" disabled>
-                                            {% endif %}
+                                                    <input type="radio" disabled checked>
+                                                {% else %}
+                                                    <input type="radio" disabled>
+                                                {% endif %}
                                                 {{ answer.content }}
 
                                                 {% csrf_token %}
@@ -71,12 +71,27 @@
                         </div>
 
                     {% endfor %}
+
                 </div>
                 <button id="test_case-create" class="btn" type="button" name="button">
                     <i class="fas fa-fw fa-plus"></i>
                     add TestCase
                 </button>
             </div>
+            <div class="col-lg-2"></div>
+            {% if warnings %}
+                <div class="col-lg-4">
+                    <div class="card text-white bg-warning mb-3" style="max-width: 18rem;">
+                        <div class="card-header bg-warning">Warning</div>
+                        {% for warn in warnings %}
+                        <div class="card-body">
+                            <h5 class="card-title"></h5>
+                            <p class="card-text">{{warn}}</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
         </div>
     </div>
 

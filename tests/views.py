@@ -12,7 +12,6 @@ from tests.filters import TestFilter
 from tests.forms import TestForm, TestCaseForm, AnswerForm, CommentForm
 from tests.models import Test, TestCase, Answer, UserTests
 from tests.tables import TestTable
-from users.models import User
 
 
 class TestCompleteView(LoginRequiredMixin, TemplateView):
@@ -20,6 +19,7 @@ class TestCompleteView(LoginRequiredMixin, TemplateView):
 
     def post(self, request, test_id: int = None):
         test = Test.objects.get(id=test_id)
+
         if request.POST and request.user:
             for answer in request.POST.getlist("answers"):
                 try:
@@ -27,29 +27,13 @@ class TestCompleteView(LoginRequiredMixin, TemplateView):
                 except ValueError:
                     break
                 request.user.save()
-            score = self.calculate_result(user=request.user, test=test)
+            score = test.calculate_result(user=request.user)
             result = UserTests(user=request.user, test=test, score=score)
             result.save()
             return HttpResponseRedirect(redirect_to=reverse_lazy("test-detail", args=[str(test_id), ]))
 
         context = self.get_context_data(test=test)
         return self.render_to_response(context)
-
-    @staticmethod
-    def calculate_result(user: User, test: Test):
-        score = 0
-        for test_case in test.testcase_set.all():
-            correct_answers = test_case.answer_set.filter(is_correct=True)
-            user_answers = user.users_answers.filter(test_case=test_case)
-
-            if user_answers and correct_answers:
-                coef = correct_answers.count() / user_answers.count()
-                if coef > 1:
-                    coef = 1
-                score_per_answer = float(test_case.score / correct_answers.count()) * coef
-                if coef > 0.6:
-                    score += user_answers.filter(is_correct=True).count() * score_per_answer
-        return score
 
     def get(self, request, *args, **kwargs):
         return self.post(request, *args, **kwargs)
@@ -150,7 +134,15 @@ class TestDetailView(LoginRequiredMixin, View):
             test.result = request_user_results.first().score
         test.score = test.testcase_set.all().aggregate(Sum("score")).get("score__sum", None)
         owner = request.user == test.owner
-        return render(request, template_name="test/test-detail.html", context={"test": test, "owner": owner, "comment_form": comment_form})
+        return render(
+            request, template_name="test/test-detail.html",
+            context={
+                "test": test,
+                "owner": owner,
+                "comment_form":comment_form,
+                "warnings": test.get_warnings()
+            }
+                      )
 
 
 class TestUpdateView(LoginRequiredMixin, TemplateView):
@@ -164,7 +156,7 @@ class TestUpdateView(LoginRequiredMixin, TemplateView):
             if test_form.is_valid():
                 test_form.save()
                 return HttpResponseRedirect(reverse_lazy('test-details', args=[str(test.id),]))
-            context = self.get_context_data(test_form=test_form, test=test)
+            context = self.get_context_data(test_form=test_form, test=test, warnings=test.get_warnings())
 
             return self.render_to_response(context)
         else:

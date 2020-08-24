@@ -21,9 +21,16 @@
 
                         </form>
                     </div>
+                    <div class="col-lg-6"></div>
+                    <div class="p-1">
+                        <a class="btn" href="{% url "test-create" %}">
+                            <i class="fas fa-fw fa-plus"></i>
+                            Create test
+                        </a>
+                    </div>
                 </div>
                 <div class="table">
-                {% render_table table %}
+                    {% render_table table %}
                 </div>
             </div>
         </div>

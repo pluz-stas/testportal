@@ -1,8 +1,6 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
-from django.shortcuts import render
 
-from django.views.generic import TemplateView
 from django.views.generic import TemplateView, CreateView
 
 from .forms import SignUpForm, UserForm
@@ -12,7 +10,7 @@ from django.urls import reverse_lazy
 
 class SignUpView(CreateView):
     form_class = SignUpForm
-    success_url = reverse_lazy('home')
+    success_url = reverse_lazy('test-list')
     template_name = 'auth/register.html'
 
 

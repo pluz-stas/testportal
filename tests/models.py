@@ -9,6 +9,25 @@ class Test(models.Model):
     title = models.CharField(max_length=30, null=True)
     description = models.CharField(max_length=255, null=True, blank=True)
 
+    def calculate_result(self, user: User):
+        score = 0
+        for test_case in self.testcase_set.all():
+            correct_answers = test_case.answer_set.filter(is_correct=True)
+            user_answers = user.users_answers.filter(test_case=test_case)
+
+            if user_answers and correct_answers:
+                coef = correct_answers.count() / user_answers.count()
+                if coef > 1:
+                    coef = 1
+                score_per_answer = float(test_case.score / correct_answers.count()) * coef
+                if coef > 0.6:
+                    score += user_answers.filter(is_correct=True).count() * score_per_answer
+        return score
+
+    def get_warnings(self):
+        if self.testcase_set.all().count() < 5:
+            return ["there are few test cases in the test"]
+
 
 class TestCase(models.Model):
     test = models.ForeignKey(Test, on_delete=models.CASCADE, null=True, blank=True)

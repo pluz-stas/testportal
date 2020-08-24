@@ -8,16 +8,36 @@
     <div class="container-fluid">
 
         <!-- Page Heading -->
-        <div class=" align-items-center justify-content-between mb-4 mt-4">
-            <h1 class="h3 mb-0 text-gray-800">Title: {{ test.title }}</h1>
-            <p class="mb-0 text-gray-800">Description: {{ test.description }}</p>
-            <p class="mb-0 text-gray-800">Score: {{ test.score }}</p>
-            {% if test.result %}
-                <p class="mb-0 text-gray-800">You result: {{ test.result }}</p>
-            {% endif %}
-            {% if test.count %}
-                <p class="mb-0 text-gray-800">Count of users: {{ test.count }}</p>
-            {% endif %}
+        <div class="row">
+            <div class="col-lg-6">
+                <div class=" align-items-center justify-content-between mb-4 mt-4">
+                    <h1 class="h3 mb-0 text-gray-800">Title: {{ test.title }}</h1>
+                    <p class="mb-0 text-gray-800">Description: {{ test.description }}</p>
+                    <p class="mb-0 text-gray-800">Max score: {{ test.score }}</p>
+                    {% if test.result %}
+                        <p class="mb-0 text-gray-800">You result: {{ test.result }}</p>
+                    {% endif %}
+                    {% if test.count %}
+                        <p class="mb-0 text-gray-800">Count of users: {{ test.count }}</p>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-lg-2"></div>
+            <div class="col-lg-4">
+                {% if warnings %}
+                    <div class="col-lg-4">
+                        <div class="card text-white bg-warning mb-3" style="max-width: 18rem;">
+                            <div class="card-header bg-warning">Warning</div>
+                            {% for warn in warnings %}
+                                <div class="card-body">
+                                    <h5 class="card-title"></h5>
+                                    <p class="card-text">{{ warn }}</p>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
         </div>
 
         <div class="row">
@@ -28,7 +48,7 @@
             </div>
             <div class="col-lg-1">
                 <a href="{% url 'test-complete' test.id %}"
-                   class="btn btn-sm btn-primary shadow-sm{% if test.result %} disabled{% endif %}">Start
+                   class="btn btn-sm btn-primary shadow-sm{% if test.result != None %} disabled{% endif %}">Start
                     test</a>
             </div>
         </div>
